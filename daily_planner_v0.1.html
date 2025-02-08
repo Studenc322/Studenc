@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн-Ежедневник</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+        .calendar-view { display: flex; flex-direction: column; align-items: center; }
+        .calendar-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-top: 20px; }
+        .calendar-day { padding: 10px; margin: 5px; border: 1px solid #ddd; cursor: pointer; text-align: center; width: 100px; background: #f4f4f4; }
+    </style>
+</head>
+<body>
+    <h2 id="currentDate"></h2>
+    <input type="text" id="taskInput" placeholder="Введите задачу">
+    
+    <select id="priorityButton">
+        <option value="" selected disabled hidden>Приоритет</option>
+        <option value="Низкий">Низкий</option>
+        <option value="Средний">Средний</option>
+        <option value="Высокий">Высокий</option>
+    </select>
+    
+    <select id="dateButton">
+        <option value="" selected disabled hidden>Дата</option>
+    </select>
+    
+    <button onclick="addTask()">Добавить</button>
+    
+    <div class="calendar-container" id="calendar"></div>
+    
+    <script>
+        let currentDateHeader = document.getElementById("currentDate");
+        let calendarContainer = document.getElementById("calendar");
+        let baseDate = new Date();
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let selectedPriority = "";
+        let selectedDate = "";
+
+        function updateCurrentDateHeader() {
+            currentDateHeader.innerText = baseDate.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+            generateMonthView();
+            populateDatePicker();
+        }
+
+        function generateMonthView() {
+            calendarContainer.innerHTML = "";
+            let year = baseDate.getFullYear();
+            let month = baseDate.getMonth();
+            let daysInMonth = new Date(year, month + 1, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                let dayDate = new Date(year, month, day);
+                let dayDiv = document.createElement("div");
+                dayDiv.className = "calendar-day";
+                dayDiv.innerText = dayDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', weekday: 'short' });
+                calendarContainer.appendChild(dayDiv);
+            }
+        }
+
+        function populateDatePicker() {
+            let dateMenu = document.getElementById("dateButton");
+            dateMenu.innerHTML = "<option value='' selected disabled hidden>Дата</option>";
+            for (let i = 0; i < 30; i++) {
+                let futureDate = new Date();
+                futureDate.setDate(futureDate.getDate() + i);
+                let dateOption = document.createElement("option");
+                dateOption.value = futureDate.toISOString();
+                dateOption.innerText = futureDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', weekday: 'short' });
+                dateMenu.appendChild(dateOption);
+            }
+        }
+
+        updateCurrentDateHeader();
+    </script>
+</body>
+</html>
